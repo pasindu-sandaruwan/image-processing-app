@@ -17,7 +17,7 @@ const getAndSaveMergedCatImages = async ( req, res, next ) =>{
         const width = req.query.width ?? 400;
         const height = req.query.height ?? 500;
         const color = req.query.color ?? "Pink";
-        const size = req.query.size ?? 100;
+        const size = 100;
 
         const params = {
             width : width,
