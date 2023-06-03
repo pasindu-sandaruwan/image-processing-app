@@ -1,57 +1,25 @@
-let { writeFile } = require('fs');
-let { join } = require('path');
-let request = require('request');
-let mergeImg = require('merge-img');
-let argv = require('minimist')(process.argv.slice(2));
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const app = express();
 
-let {
-    greeting = 'Hello', who = 'You',
-    width = 400, height = 500, color = 'Pink', size = 100,
-} = argv;
+dotenv.config();
 
-let firstReq = {
-// https://cataas.com/cat/says/Hi%20There?width=500&amp;height=800&amp;c=Cyan&amp;s=150
-url: 'https://cataas.com/cat/says/' + greeting + '?width=' + width + '&height=' + height + '&color' + color + '&s=' + size, encoding: 'binary'
-};
+const catRoutes = require("./routes/cat.routes");
 
-let secondReq = {
-    url: 'https://cataas.com/cat/says/' + who + '?width=' + width + '&height=' + height + '&color' + color + '&s=' + size, encoding: 'binary'
-};
+app.use( cors() ); // All Cors are allowed
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
-request.get(firstReq, (err, res, firstBody) => { 
-    if(err) {
-        console.log(err);
-        return; 
-    }
-    
-    console.log('Received response with status:' + res.statusCode);
-    
-    request.get(secondReq, (err, res, secondBody) => { 
-        if(err) {
-            console.log(err);
-            return; 
-        }
-        
-        console.log('Received response with status:' + res.statusCode); 
+app.use("/cats", catRoutes );
 
-        mergeImg([ 
-          { src: new Buffer(firstBody, 'binary'), x: 0, y:0 }, 
-          { src: new Buffer(secondBody, 'binary'), x: width, y: 0 }
-        ]).then(img => {
-          img.getBuffer('image/jpeg', (err, buffer) => {
-                if (err) {
-                  console.log(err)
-                }
-
-                const fileOut = join(process.cwd(), `/cat-card.jpg`);
-                
-                writeFile(fileOut, buffer, 'binary', (err) => { if(err) {
-                    console.log(err);
-                    return; 
-                }
-                
-                console.log("The file was saved!"); });
-              });
-            }); 
-        });
+// Hanlde API not found error
+app.use((req, res, next) => {
+    throw res.status(404).json({message : "API endpoint not found"});
 });
+
+// Start the server with the port 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, ()=>{
+    console.log(`Server is running and listening to port ${PORT}`);
+})
