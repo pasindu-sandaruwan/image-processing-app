@@ -1,25 +1,38 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const app = express();
 
-dotenv.config();
+import catService from './services/cat.service.js';
+import constants from './utils/common.constants.js';
+import minimist from 'minimist';
+import commonUtil from './utils/common.util.js';
 
-const catRoutes = require("./routes/cat.routes");
+const argv = minimist(process.argv.slice(2));
+const argVInputsArray =  argv._; //store the argv input array to a variable
 
-app.use( cors() ); // All Cors are allowed
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+/*
+* Function to prepare the incoming argv values as inputs
+*/
+const prepareAndGetImageInputs = ( inputs ) =>{
+    return {
+        firstMessage : inputs[0] ?? constants.DEFAULT.FIRST_MESSAGE, 
+        secondMessage : inputs[1] ?? constants.DEFAULT.SECOND_MESSAGE
+    }
+}
 
-app.use("/cats", catRoutes );
+/*
+* Function to prepare the image properties based on the argv inputs
+* If the inputs are not present the values are set to default values
+*/
+const prepareAndGetImageProps = ( inputs ) =>{
+    return {
+        width : inputs[2] ?? constants.IMAGE_CONFIG.WIDTH,
+        height : inputs[3] ?? constants.IMAGE_CONFIG.HEIGHT,
+        c : inputs[4] ?? constants.IMAGE_CONFIG.COLOR,
+        s : inputs[5] ?? constants.IMAGE_CONFIG.SIZE
+    }
+}
 
-// Hanlde API not found error
-app.use((req, res, next) => {
-    throw res.status(404).json({message : "API endpoint not found"});
-});
+const main = async () =>{
 
-// Start the server with the port 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, ()=>{
-    console.log(`Server is running and listening to port ${PORT}`);
-})
+
+}
+
+main();
