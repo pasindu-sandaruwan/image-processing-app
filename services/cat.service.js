@@ -13,8 +13,8 @@ const fetchCatImageWithText = async (text, params ) =>{
         return response.data;
 
     }catch(error){
-        console.error(error);
-        throw new Error(error);
+        console.log( error.toString() )
+        throw new Error( error.toString() );
     }
 }
 
