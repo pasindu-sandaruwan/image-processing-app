@@ -1,8 +1,6 @@
 
-import catService from './services/cat.service.js';
 import constants from './utils/common.constants.js';
 import minimist from 'minimist';
-import commonUtil from './utils/common.util.js';
 
 const argv = minimist(process.argv.slice(2));
 const argVInputsArray =  argv._; //store the argv input array to a variable
