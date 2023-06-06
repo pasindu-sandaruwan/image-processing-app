@@ -1,23 +1,27 @@
-const mergeImg = require('merge-img');
-const { join } = require('path');
-const { writeFile, existsSync, mkdirSync } = require('fs');
+import mergeImg from 'merge-img';
+import { join } from 'path';
+import { writeFile, existsSync, mkdirSync } from 'fs';
+import { promisify } from 'util';
 
 const mergeTwoImages = async (firstImage, secondImage, width ) => {
-    mergeImg([
+
+    const mergedImgData = await mergeImg([
         { src: new Buffer.from(firstImage, "binary"), x: 0, y: 0 },
         { src: new Buffer.from(secondImage, "binary"), x: width, y: 0 },
-    ]).then((img) => {
-        img.getBuffer("image/jpeg", (err, buffer) => {
-            if (err) {
-                console.log(err);
-            }
-            saveImageToStorage( buffer );
-        });
+    ])
+
+    const imageBuffer = mergedImgData.getBuffer("image/jpeg", (err, buffer) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log("Images merged");
+        return buffer;
     });
+
+    return imageBuffer;
 };
 
-// TODO : Best to modify this function later to store the image in to a cloud storage and return the link
-const saveImageToStorage = ( image ) =>{
+const saveImageToStorage = async ( image ) =>{
 
     const storageName = "image-storage"; 
 
@@ -29,15 +33,11 @@ const saveImageToStorage = ( image ) =>{
 
     const fileOut = join(process.cwd(), `/${storageName}/${generateCurrentTimestamp()}.jpg`);
 
-    writeFile(fileOut, image, "binary", (err) => {
-        if (err) {
-            console.error(err);
-            throw new Error(err);
-        }
+    const writeFileAsync = promisify( writeFile ); // convert the callback writeFile function into a promise-based function
+    await writeFileAsync( fileOut, image );
 
-        console.log("The file was saved!");
-        return;
-    });
+    console.log(`Image saved successfully to the location: ${fileOut}`);
+    return true;
 }
 
 const generateCurrentTimestamp = () =>{
@@ -45,8 +45,9 @@ const generateCurrentTimestamp = () =>{
     return date.getTime();
 }
 
-module.exports = {
+export default{
     mergeTwoImages,
-    generateCurrentTimestamp
+    generateCurrentTimestamp,
+    saveImageToStorage
 }
 
