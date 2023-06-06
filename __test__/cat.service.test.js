@@ -1,4 +1,4 @@
-const { fetchCatImageWithText } = require("../services/cat.service");
+import catService from "../services/cat.service";
 
 describe("Test cat service", ()=>{
     test("Cat image fetch API with a text", async ()=>{
@@ -9,7 +9,7 @@ describe("Test cat service", ()=>{
             s : 100
         }
         
-        const image = await fetchCatImageWithText("Hey",params);
+        const image = await catService.fetchCatImageWithText("Hey",params);
         expect( typeof image ).toBe("string");
     })
 })

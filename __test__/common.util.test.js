@@ -1,16 +1,17 @@
-const { fetchCatImageWithText } = require("../services/cat.service");
-const { generateCurrentTimestamp, mergeTwoImages } = require("../utils/common.util");
+import catService from "../services/cat.service";
+import commonUtil from "../utils/common.util";
+
 
 describe("Test common util", ()=>{
     test("Merge two images", async () =>{
-        const firstImage = await fetchCatImageWithText("Hey", null);
-        const secondImage = await fetchCatImageWithText("You", null );
+        const firstImage = await  catService.fetchCatImageWithText("Hey", null);
+        const secondImage = await catService.fetchCatImageWithText("You", null );
 
-        await mergeTwoImages( firstImage, secondImage, 400 );
+        await commonUtil.mergeTwoImages( firstImage, secondImage, 400 );
     })
 
     test("Generate current timestamp", ()=>{
-       const timestamp = generateCurrentTimestamp();
+       const timestamp = commonUtil.generateCurrentTimestamp();
        expect( typeof timestamp ).toBe("number");
     })
 })
