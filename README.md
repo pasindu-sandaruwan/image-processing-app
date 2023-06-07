@@ -3,8 +3,8 @@
 
 #### Supported Versions
 
-[![Node.js Version](https://img.shields.io/badge/Node.js-12%2B-brightgreen)](https://nodejs.org/)
-[![Node.js Version](https://img.shields.io/badge/npm-6.9.0%2B-blue)](https://www.npmjs.com/)
+[![Node.js Version](https://img.shields.io/badge/Node.js-16.15.1%2B-brightgreen)](https://nodejs.org/en/blog/release/v16.15.1)
+[![Node.js Version](https://img.shields.io/badge/npm-8.12.2%2B-blue)](https://www.npmjs.com/package/npm/v/8.12.2)
 
 # Execution Steps
 Run the npm comman to install all the dependencies from package.json
