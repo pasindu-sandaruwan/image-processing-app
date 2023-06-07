@@ -1,53 +1,55 @@
-import mergeImg from 'merge-img';
-import { join } from 'path';
-import { writeFile, existsSync, mkdirSync } from 'fs';
-import { promisify } from 'util';
+import mergeImg from "merge-img";
+import { join } from "path";
+import { writeFile, existsSync, mkdirSync } from "fs";
+import { promisify } from "util";
+import constants from "./common.constants.js";
 
-const mergeTwoImages = async (firstImage, secondImage, width ) => {
+const mergeTwoImages = async (firstImage, secondImage, width) => {
+    try {
+        const mergedImgData = await mergeImg([
+            { src: new Buffer.from(firstImage, "binary"), x: 0, y: 0 },
+            { src: new Buffer.from(secondImage, "binary"), x: width, y: 0 },
+        ]);
 
-    const mergedImgData = await mergeImg([
-        { src: new Buffer.from(firstImage, "binary"), x: 0, y: 0 },
-        { src: new Buffer.from(secondImage, "binary"), x: width, y: 0 },
-    ])
+        const getBufferAsync = promisify(mergedImgData.getBuffer);
+        const imageBuffer = await getBufferAsync.call(mergedImgData, "image/jpeg");
 
-    const imageBuffer = mergedImgData.getBuffer("image/jpeg", (err, buffer) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log("Images merged");
-        return buffer;
-    });
-
-    return imageBuffer;
+        return imageBuffer;
+    } catch (error) {
+        console.log(error.toString());
+        throw new Error(error.toString());
+    }
 };
 
-const saveImageToStorage = async ( image ) =>{
+const saveImageToStorage = async (image) => {
+    try{
+        const storageName = constants.IMAGE_STORAGE_NAME;
 
-    const storageName = "image-storage"; 
-
-    // Create the folder if it doesn't exist
-    const folderPath = process.cwd() + `/${storageName}`;
-    if (!existsSync(folderPath)) {
-        mkdirSync(folderPath, { recursive: true });
+        // Create the folder if it doesn't exist
+        const folderPath = process.cwd() + `/${storageName}`;
+        if (!existsSync(folderPath)) {
+            mkdirSync(folderPath, { recursive: true });
+        }
+    
+        const fileOut = join(process.cwd(), `/${storageName}/${generateCurrentTimestamp()}.jpg`);
+    
+        const writeFileAsync = promisify(writeFile);
+        await writeFileAsync(fileOut, image);
+    
+        return true;   
+    }catch(error){
+        console.log(error.toString());
+        throw new Error(error.toString());
     }
+};
 
-    const fileOut = join(process.cwd(), `/${storageName}/${generateCurrentTimestamp()}.jpg`);
-
-    const writeFileAsync = promisify( writeFile ); // convert the callback writeFile function into a promise-based function
-    await writeFileAsync( fileOut, image );
-
-    console.log(`Image saved successfully to the location: ${fileOut}`);
-    return true;
-}
-
-const generateCurrentTimestamp = () =>{
+const generateCurrentTimestamp = () => {
     const date = new Date();
     return date.getTime();
-}
+};
 
-export default{
+export default {
     mergeTwoImages,
     generateCurrentTimestamp,
-    saveImageToStorage
-}
-
+    saveImageToStorage,
+};
